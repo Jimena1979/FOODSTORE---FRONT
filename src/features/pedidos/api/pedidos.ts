@@ -16,7 +16,7 @@ export async function crearPedido(data: PedidoCreate): Promise<PedidoRead> {
 export async function listarPedidos(
   params: PedidosQueryParams = {}
 ): Promise<PedidosPaginados> {
-  const cleanParams: Record<string, string | number> = {};
+  const cleanParams: Record<string, string | number | boolean> = {};
   if (params.skip !== undefined) {
     cleanParams.skip = params.skip;
   }
@@ -25,6 +25,9 @@ export async function listarPedidos(
   }
   if (params.estado && params.estado.trim().length > 0) {
     cleanParams.estado = params.estado.trim();
+  }
+  if (params.solo_mios !== undefined) {
+    cleanParams.solo_mios = params.solo_mios;
   }
 
   const response = await axiosInstance.get<PedidosPaginados>("/pedidos", {

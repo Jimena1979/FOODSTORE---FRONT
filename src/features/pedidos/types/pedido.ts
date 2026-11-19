@@ -59,4 +59,5 @@ export interface PedidosQueryParams {
   skip?: number;
   limit?: number;
   estado?: EstadoPedido | "";
+  solo_mios?: boolean;
 }

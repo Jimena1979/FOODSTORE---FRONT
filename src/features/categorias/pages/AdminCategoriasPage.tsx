@@ -76,20 +76,18 @@ export function AdminCategoriasPage() {
   const abrirCrear = (): void => {
     setErrorForm(null);
     setCategoriaEditando(null);
-    form.reset({
-      nombre: "",
-      descripcion: "",
-    });
+    form.reset();
+    form.setFieldValue("nombre", "");
+    form.setFieldValue("descripcion", "");
     setModalAbierto(true);
   };
 
   const abrirEditar = (categoria: CategoriaRead): void => {
     setErrorForm(null);
     setCategoriaEditando(categoria);
-    form.reset({
-      nombre: categoria.nombre,
-      descripcion: categoria.descripcion ?? "",
-    });
+    form.reset();
+    form.setFieldValue("nombre", categoria.nombre);
+    form.setFieldValue("descripcion", categoria.descripcion ?? "");
     setModalAbierto(true);
   };
 

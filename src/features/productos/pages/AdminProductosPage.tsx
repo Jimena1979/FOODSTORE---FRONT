@@ -172,30 +172,31 @@ export function AdminProductosPage() {
   const abrirCrear = (): void => {
     setErrorForm(null);
     setProductoEditando(null);
-    productoForm.reset({
-      nombre: "",
-      descripcion: "",
-      precio_base: "0",
-      imagen_url: "",
-      stock: "0",
-      disponible: true,
-      categoria_id: categorias[0] ? String(categorias[0].id) : "",
-    });
+    productoForm.reset();
+    productoForm.setFieldValue("nombre", "");
+    productoForm.setFieldValue("descripcion", "");
+    productoForm.setFieldValue("precio_base", "0");
+    productoForm.setFieldValue("imagen_url", "");
+    productoForm.setFieldValue("stock", "0");
+    productoForm.setFieldValue("disponible", true);
+    productoForm.setFieldValue(
+      "categoria_id",
+      categorias[0] ? String(categorias[0].id) : ""
+    );
     setModalFormAbierto(true);
   };
 
   const abrirEditar = (prod: ProductoRead): void => {
     setErrorForm(null);
     setProductoEditando(prod);
-    productoForm.reset({
-      nombre: prod.nombre,
-      descripcion: prod.descripcion ?? "",
-      precio_base: String(prod.precio_base),
-      imagen_url: prod.imagen_url ?? "",
-      stock: String(prod.stock),
-      disponible: prod.disponible,
-      categoria_id: String(prod.categoria_id),
-    });
+    productoForm.reset();
+    productoForm.setFieldValue("nombre", prod.nombre);
+    productoForm.setFieldValue("descripcion", prod.descripcion ?? "");
+    productoForm.setFieldValue("precio_base", String(prod.precio_base));
+    productoForm.setFieldValue("imagen_url", prod.imagen_url ?? "");
+    productoForm.setFieldValue("stock", String(prod.stock));
+    productoForm.setFieldValue("disponible", prod.disponible);
+    productoForm.setFieldValue("categoria_id", String(prod.categoria_id));
     setModalFormAbierto(true);
   };
 
@@ -208,10 +209,9 @@ export function AdminProductosPage() {
   const abrirStock = (prod: ProductoRead): void => {
     setErrorStock(null);
     setProductoStock(prod);
-    stockForm.reset({
-      stock: String(prod.stock),
-      disponible: prod.disponible,
-    });
+    stockForm.reset();
+    stockForm.setFieldValue("stock", String(prod.stock));
+    stockForm.setFieldValue("disponible", prod.disponible);
     setModalStockAbierto(true);
   };
 

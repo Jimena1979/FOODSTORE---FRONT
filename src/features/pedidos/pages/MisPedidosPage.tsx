@@ -22,6 +22,7 @@ export function MisPedidosPage() {
   const { data, isLoading, isError, error, refetch } = usePedidos({
     skip: pagina * PAGE_SIZE,
     limit: PAGE_SIZE,
+    solo_mios: true,
   });
 
   const cancelarMutation = useCancelarPedido();
