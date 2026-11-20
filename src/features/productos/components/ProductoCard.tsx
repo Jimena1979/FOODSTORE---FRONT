@@ -1,16 +1,23 @@
 import { useState } from "react";
-import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
+import { type CartItem, getCartOwnerKey, useCartStore } from "@/store/cartStore";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import type { ProductoRead } from "../types/producto";
+
+const EMPTY_CART: CartItem[] = [];
 
 interface ProductoCardProps {
   producto: ProductoRead;
 }
 
 export function ProductoCard({ producto }: ProductoCardProps) {
+  const usuarioId = useAuthStore((state) => state.usuario?.id ?? null);
+  const ownerKey = getCartOwnerKey(usuarioId);
+
   const agregar = useCartStore((state) => state.agregar);
-  const itemsCarrito = useCartStore((state) => state.items);
+  const rawItems = useCartStore((state) => state.cartsByUser[ownerKey]);
+  const itemsCarrito = rawItems ?? EMPTY_CART;
   const [agregadoFeedback, setAgregadoFeedback] = useState(false);
 
   const enCarrito =
@@ -26,14 +33,17 @@ export function ProductoCard({ producto }: ProductoCardProps) {
     if (!puedeAgregar) {
       return;
     }
-    agregar({
-      producto_id: producto.id,
-      nombre: producto.nombre,
-      precio_unitario: producto.precio_base,
-      cantidad: 1,
-      stockMax: producto.stock,
-      imagen_url: producto.imagen_url,
-    });
+    agregar(
+      {
+        producto_id: producto.id,
+        nombre: producto.nombre,
+        precio_unitario: producto.precio_base,
+        cantidad: 1,
+        stockMax: producto.stock,
+        imagen_url: producto.imagen_url,
+      },
+      usuarioId
+    );
     setAgregadoFeedback(true);
     setTimeout(() => setAgregadoFeedback(false), 1200);
   };

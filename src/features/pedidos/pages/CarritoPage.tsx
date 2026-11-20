@@ -1,15 +1,22 @@
 import { Link } from "react-router-dom";
-import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
+import { type CartItem, getCartOwnerKey, useCartStore } from "@/store/cartStore";
 import { EstadoVacio } from "@/shared/components/EstadoVacio";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
+const EMPTY_CART: CartItem[] = [];
+
 export function CarritoPage() {
-  const items = useCartStore((state) => state.items);
+  const usuarioId = useAuthStore((state) => state.usuario?.id ?? null);
+  const ownerKey = getCartOwnerKey(usuarioId);
+
+  const rawItems = useCartStore((state) => state.cartsByUser[ownerKey]);
+  const items = rawItems ?? EMPTY_CART;
   const cambiarCantidad = useCartStore((state) => state.cambiarCantidad);
   const quitar = useCartStore((state) => state.quitar);
   const vaciar = useCartStore((state) => state.vaciar);
-  const total = useCartStore((state) => state.total());
+  const total = useCartStore((state) => state.total(usuarioId));
 
   if (items.length === 0) {
     return (
@@ -37,7 +44,11 @@ export function CarritoPage() {
             Revisá las cantidades antes de confirmar tu pedido.
           </p>
         </div>
-        <Button variant="secondary" size="sm" onClick={() => vaciar()}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => vaciar(usuarioId)}
+        >
           Vaciar carrito
         </Button>
       </div>
@@ -67,7 +78,11 @@ export function CarritoPage() {
                       variant="secondary"
                       size="sm"
                       onClick={() =>
-                        cambiarCantidad(item.producto_id, item.cantidad - 1)
+                        cambiarCantidad(
+                          item.producto_id,
+                          item.cantidad - 1,
+                          usuarioId
+                        )
                       }
                     >
                       -
@@ -83,7 +98,11 @@ export function CarritoPage() {
                         item.cantidad >= item.stockMax
                       }
                       onClick={() =>
-                        cambiarCantidad(item.producto_id, item.cantidad + 1)
+                        cambiarCantidad(
+                          item.producto_id,
+                          item.cantidad + 1,
+                          usuarioId
+                        )
                       }
                     >
                       +
@@ -97,7 +116,7 @@ export function CarritoPage() {
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => quitar(item.producto_id)}
+                    onClick={() => quitar(item.producto_id, usuarioId)}
                   >
                     Quitar
                   </Button>

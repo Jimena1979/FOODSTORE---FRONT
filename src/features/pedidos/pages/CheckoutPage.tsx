@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
+import { type CartItem, getCartOwnerKey, useCartStore } from "@/store/cartStore";
 import { EstadoVacio } from "@/shared/components/EstadoVacio";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -7,11 +8,17 @@ import { CheckoutForm } from "../components/CheckoutForm";
 import { useCrearPedido } from "../hooks/usePedidos";
 import type { PedidoCreate } from "../types/pedido";
 
+const EMPTY_CART: CartItem[] = [];
+
 export function CheckoutPage() {
   const navigate = useNavigate();
-  const items = useCartStore((state) => state.items);
+  const usuarioId = useAuthStore((state) => state.usuario?.id ?? null);
+  const ownerKey = getCartOwnerKey(usuarioId);
+
+  const rawItems = useCartStore((state) => state.cartsByUser[ownerKey]);
+  const items = rawItems ?? EMPTY_CART;
   const vaciar = useCartStore((state) => state.vaciar);
-  const total = useCartStore((state) => state.total());
+  const total = useCartStore((state) => state.total(usuarioId));
 
   const crearPedidoMutation = useCrearPedido();
 
@@ -27,7 +34,7 @@ export function CheckoutPage() {
     };
 
     await crearPedidoMutation.mutateAsync(payload);
-    vaciar();
+    vaciar(usuarioId);
     navigate("/mis-pedidos");
   };
 

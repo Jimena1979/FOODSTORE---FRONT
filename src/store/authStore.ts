@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { axiosInstance } from "@/shared/api/axiosInstance";
+import { useCartStore } from "@/store/cartStore";
 
 export type UserRole = "user" | "admin";
 
@@ -46,7 +47,10 @@ export const useAuthStore = create<AuthState>()(
         });
 
         const meResponse = await axiosInstance.get<AuthUser>("/auth/me");
-        set({ usuario: meResponse.data, cargando: false });
+        const usuarioAutenticado = meResponse.data;
+
+        useCartStore.getState().mergeGuestCartToUser(usuarioAutenticado.id);
+        set({ usuario: usuarioAutenticado, cargando: false });
       },
 
       logout: async () => {
@@ -61,7 +65,9 @@ export const useAuthStore = create<AuthState>()(
         set({ cargando: true });
         try {
           const response = await axiosInstance.get<AuthUser>("/auth/me");
-          set({ usuario: response.data, cargando: false });
+          const usuarioActual = response.data;
+          useCartStore.getState().mergeGuestCartToUser(usuarioActual.id);
+          set({ usuario: usuarioActual, cargando: false });
         } catch {
           set({ usuario: null, cargando: false });
         }
@@ -77,3 +83,4 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+

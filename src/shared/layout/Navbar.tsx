@@ -1,13 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
-import { useCartStore } from "@/store/cartStore";
+import { type CartItem, getCartOwnerKey, useCartStore } from "@/store/cartStore";
 import { Button } from "@/shared/ui/Button";
+
+const EMPTY_CART: CartItem[] = [];
 
 export function Navbar() {
   const navigate = useNavigate();
   const usuario = useAuthStore((state) => state.usuario);
   const logout = useAuthStore((state) => state.logout);
-  const items = useCartStore((state) => state.items);
+  const ownerKey = getCartOwnerKey(usuario?.id ?? null);
+  const rawItems = useCartStore((state) => state.cartsByUser[ownerKey]);
+  const items = rawItems ?? EMPTY_CART;
 
   const cantidadTotalItems = items.reduce((acc, item) => acc + item.cantidad, 0);
 
